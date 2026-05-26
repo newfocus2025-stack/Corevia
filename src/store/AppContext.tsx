@@ -7,6 +7,10 @@ interface AppContextType {
   setLanguage: (lang: Language) => void;
   darkMode: boolean;
   toggleDarkMode: () => void;
+  currentUser: { email: string; name: string } | null;
+  login: (email: string, pwd: string) => boolean;
+  register: (name: string, email: string, pwd: string) => boolean;
+  logout: () => void;
   orders: Order[];
   setOrders: (orders: Order[]) => void;
   addOrder: (order: Order) => void;
@@ -185,6 +189,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [fixedExpenseLastAmounts, setFixedExpenseLastAmounts] = useState<Record<string, number>>(() => loadFromStorage<Record<string, number>>('fixedExpenseLastAmounts', {}));
   const [workerExpenseEntries, setWorkerExpenseEntries] = useState<WorkerExpenseEntry[]>(() => loadFromStorage<WorkerExpenseEntry[]>('workerExpenseEntries', []));
   const [adExpenses, setAdExpenses] = useState<AdExpense[]>(() => loadFromStorage<AdExpense[]>('adExpenses', []));
+  const [users, setUsers] = useState<{ email: string; password: string; name: string }[]>(() => loadFromStorage<{ email: string; password: string; name: string }[]>('users', []));
+  const [currentUser, setCurrentUser] = useState<{ email: string; name: string } | null>(() => loadFromStorage<{ email: string; name: string } | null>('currentUser', null));
+
+  const login = (email: string, pwd: string): boolean => {
+    const found = users.find(u => u.email === email && u.password === pwd);
+    if (found) { setCurrentUser({ email: found.email, name: found.name }); return true; }
+    return false;
+  };
+  const register = (name: string, email: string, pwd: string): boolean => {
+    if (users.find(u => u.email === email)) return false;
+    const newUsers = [...users, { email, password: pwd, name }];
+    setUsers(newUsers);
+    setCurrentUser({ email, name });
+    return true;
+  };
+  const logout = () => { setCurrentUser(null); };
 
   // Auto-clean trash older than 30 days
   useEffect(() => {
@@ -209,6 +229,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     ['allVariableExpenseNames', allVariableExpenseNames], ['fixedExpenseLastAmounts', fixedExpenseLastAmounts],
     ['workerExpenseEntries', workerExpenseEntries],
     ['adExpenses', adExpenses],
+    ['users', users],
+    ['currentUser', currentUser],
   ];
   useEffect(() => {
     for (const [key, val] of STORAGE_SAVERS) {
@@ -562,6 +584,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider value={{
       language, setLanguage, darkMode, toggleDarkMode,
+      currentUser, login, register, logout,
       orders, setOrders, addOrder, updateOrder, deleteOrder, getNextOrderNumber,
       inventory, setInventory,
       subInventory, setSubInventory, updateSubStock, getSubStock,

@@ -1,13 +1,15 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../i18n/useTranslation';
 import { useAppContext } from '../store/AppContext';
-import { Save, Key, Palette } from 'lucide-react';
+import { Save, Key, Palette, LogOut } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { focusNextInput, clearZeroOnFocus } from '../shared/formHelpers';
 
 export default function Settings() {
   const { t, language } = useTranslation();
-  const { settings, updateSettings, password } = useAppContext();
+  const { settings, updateSettings, password, currentUser, logout } = useAppContext();
+  const navigate = useNavigate();
 
   const [oldPw, setOldPw] = useState('');
   const [newPw, setNewPw] = useState('');
@@ -120,6 +122,19 @@ export default function Settings() {
             style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }} />
           <button onClick={handleAddColor} className="px-4 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium">
             {t('add')}
+          </button>
+        </div>
+      </div>
+
+      {/* Logout */}
+      <div className="rounded-2xl border p-5" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{currentUser?.name}</p>
+            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{currentUser?.email}</p>
+          </div>
+          <button onClick={() => { logout(); navigate('/auth'); }} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-medium transition-all">
+            <LogOut size={16} /> {language === 'ar' ? 'تسجيل الخروج' : language === 'fr' ? 'Déconnexion' : 'Logout'}
           </button>
         </div>
       </div>

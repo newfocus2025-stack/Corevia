@@ -160,7 +160,7 @@ export default function ProfitSummary() {
     sum + Object.values(inv.colors).reduce((s, q) => s + q, 0) * (products.find(p => p.name === inv.model)?.wholesaleCostPrice ?? 0), 0)
     + returnInventory.reduce((sum, ri) => sum + ri.quantity * (products.find(p => p.name === ri.model)?.wholesaleCostPrice ?? 0), 0);
   const budgetDzd = totalAdDzd;
-  const finalProfit = netProfitPendingDelivered - totalReturnCost - budgetDzd - totalPaidWorkerAmount - totalExpensesAmount;
+  const finalProfit = netProfitPendingDelivered - totalReturnCost - budgetDzd - totalPaidWorkerAmount - totalExpensesAmount - deliveryCostOnShop;
   const finalStatus = finalProfit >= 0 ? 'profit' : 'loss';
 
   // Top stats
@@ -409,6 +409,7 @@ export default function ProfitSummary() {
                 <div className="flex justify-between text-sm"><span style={{ color: 'var(--text-secondary)' }}>{language === 'ar' ? 'مدفوعات العمال' : language === 'fr' ? 'Paiements ouvriers' : 'Worker Payments'}</span><span className="font-semibold text-green-500">{totalPaidWorkerAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })} دج</span></div>
                 <div className="flex justify-between text-sm"><span style={{ color: 'var(--text-secondary)' }}>{language === 'ar' ? 'إجمالي المصاريف' : language === 'fr' ? 'Total dépenses' : 'Total Expenses'}</span><span className="font-semibold text-orange-500">{totalExpensesAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })} دج</span></div>
                 <div className="flex justify-between text-sm"><span style={{ color: 'var(--text-secondary)' }}>{t('returnCost')}</span><span className="font-semibold text-red-500">{totalReturnCost.toLocaleString(undefined, { maximumFractionDigits: 2 })} دج</span></div>
+                <div className="flex justify-between text-sm"><span style={{ color: 'var(--text-secondary)' }}>{language === 'ar' ? 'توصيل على المحل' : language === 'fr' ? 'Livraison magasin' : 'Delivery on Shop'}</span><span className="font-semibold text-purple-500">{deliveryCostOnShop.toLocaleString(undefined, { maximumFractionDigits: 2 })} دج</span></div>
                 {monthAdEntries.length > 0 && (
                   <div className="pt-1 space-y-1.5">
                     <div className="flex justify-between text-sm"><span style={{ color: 'var(--text-secondary)' }}>{language === 'ar' ? 'ميزانية الإعلانات (دج)' : language === 'fr' ? 'Budget pub (DZD)' : 'Ad Budget (DZD)'}</span><span className="font-semibold text-cyan-500">{budgetDzd.toLocaleString(undefined, { maximumFractionDigits: 2 })} دج</span></div>
